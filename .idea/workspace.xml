@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a072450e-ae0f-4662-a5c6-8e0ed74f24f7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/instaFuncs.py" beforeDir="false" afterPath="$PROJECT_DIR$/instaFuncs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,7 +100,7 @@
       <updated>1624712239295</updated>
       <workItem from="1624712242141" duration="31000" />
       <workItem from="1627939769609" duration="1076000" />
-      <workItem from="1628010699598" duration="3738000" />
+      <workItem from="1628010699598" duration="4240000" />
     </task>
     <servers />
   </component>
