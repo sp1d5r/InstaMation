@@ -4,8 +4,10 @@ import time
 from time import sleep
 import random
 from selenium import webdriver
-
+import os
 from instaConsts import *
+
+
 '''
 How to get chrome driver working (Mac)
 1) check chrome version
@@ -21,16 +23,39 @@ Windows tutorial will be done soon + Raspberry tutorial too
 
 # save the strings of the buttons in separate file so i don't need to update the whole thing every damn time...
 
+GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
+CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
 
 def start_up(username, password):
     username = username
     password = password
-    mobile_emulation = {"deviceName": "Nexus 5"}
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
-    chrome_options.add_experimental_option("detach", True)
-    # chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome(desired_capabilities=chrome_options.to_capabilities())
+    try:
+        if (os.environ["LOCAL"]==False):
+            mobile_emulation = {"deviceName": "Nexus 5"}
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+            chrome_options.add_experimental_option("detach", True)
+            chrome_options.add_argument('--disable-gpu')
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.binary_location = GOOGLE_CHROME_PATH
+            driver = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, chrome_options=chrome_options,
+                                      desired_capabilities=chrome_options.to_capabilities())
+        else:
+            mobile_emulation = {"deviceName": "Nexus 5"}
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+            chrome_options.add_experimental_option("detach", True)
+            # chrome_options.add_argument("--headless")
+            driver = webdriver.Chrome(desired_capabilities=chrome_options.to_capabilities())
+
+    except:
+        mobile_emulation = {"deviceName": "Nexus 5"}
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+        chrome_options.add_experimental_option("detach", True)
+        # chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(desired_capabilities=chrome_options.to_capabilities())
+
     driver.set_window_size(300, 780)
     driver.get("https://www.instagram.com/accounts/login/?source=auth_switcher")
     time.sleep(1)
