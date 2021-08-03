@@ -653,7 +653,7 @@ def unfollow_users(n, method, username):
                             sleep_random_decimals(20, 40)
                             count = count + 1
 
-                        if (error ==10):
+                        if (error == 10):
                             text.append('Failed to find username 10 times in a row. Error.')
 
                         return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
