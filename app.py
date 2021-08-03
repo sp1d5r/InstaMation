@@ -706,5 +706,5 @@ def update_console_log(n):
     return array_to_string(text)
 
 
-if __name__ == '__main__':
+if __name__ == '__app__':
     app.run_server(debug=False, port=8080, host="0.0.0.0")
