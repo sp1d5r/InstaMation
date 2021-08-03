@@ -1,6 +1,5 @@
 
-from InstagramAPI import InstagramAPI
-import os
+
 import time
 from time import sleep
 import random
@@ -30,11 +29,13 @@ def start_up(username, password):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
     chrome_options.add_experimental_option("detach", True)
+    # chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(desired_capabilities=chrome_options.to_capabilities())
     driver.set_window_size(300, 780)
     driver.get("https://www.instagram.com/accounts/login/?source=auth_switcher")
     time.sleep(1)
-    login(username, password, driver)
+    if (not login(username, password, driver)):
+        raise Exception("User Failed to Log in")
     return driver
 
 
@@ -54,9 +55,7 @@ def follow(username, driver):
 
 def unfollow(username, driver):
     if is_following(username, driver):
-        driver.find_element_by_xpath(
-            "//*[@id=\"react-root\"]/section/main/div/header/section/div[2]/div[2]/span/span[1]/button/div/span["
-            "contains(@aria-label, \"Following\")]").click()
+        driver.find_element_by_xpath("//span[contains(@aria-label, \"Following\")]").click()
         sleep_random_decimals(small_lower, small_upper)
         driver.find_element_by_xpath("// button[text() = \"Unfollow\"]").click()
         action_blocked_checker(driver)
@@ -76,6 +75,7 @@ def follow_users_from_user(user, driver):
     # driver.get("https://www.instagram.com/"+ user +"/followers/")
     sleep_random_decimals(3, 7)
     go_to_page(user, driver)
+    sleep_random_decimals(3,7)
     driver.find_element_by_xpath("//*[@id=\"react-root\"]/section/main/div/ul/li[2]/a/span").click()
     usernames = []
     sleep_random_decimals(4, 7)
@@ -326,14 +326,18 @@ def send_message(username, message, driver):
 
 
 def login(username, password, driver):
+    time.sleep(2)
+    driver.find_element_by_xpath("//button[text()=\"Accept All\"]").click()
+    time.sleep(3)
     driver.find_element_by_xpath("//Input[@name=\"username\"]") \
         .send_keys(username)
     driver.find_element_by_xpath("//Input[@name=\"password\"]").send_keys(password)
     time.sleep(0.5)
     driver.find_element_by_xpath("//button[@type =\"submit\"]").click()
-    sleep(7)
+    sleep(10)
+
     try:
-        driver.find_element_by_xpath("//button[text()=\"Not Now\"]").click()
+        driver.find_element_by_xpath("//a[text()=\"Not Now\"]").click()
         sleep(5)
     except:
         print("Could not find \"Not Now\" button, carrying on with login authentication flow")
@@ -345,6 +349,15 @@ def login(username, password, driver):
     except:
         print("Could not fine \"Cancel\" button, carrying on with login authentication flow")
         sleep_random_decimals(2, 3)
+
+    try:
+        driver.find_element_by_xpath("//button[text()=\"Try Again\"]").click()
+        print("Login Failed.")
+        return False
+    except:
+        sleep_random_decimals(2,3)
+        return True
+
 
 
 def get_username_from_url(driver):

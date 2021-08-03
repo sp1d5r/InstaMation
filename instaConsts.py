@@ -45,8 +45,7 @@ def username_from_list(number):
 def follow_button_from_list(number):
     return "//*[@id=\"react-root\"]/section/main/div[1]/div/div["+str(number)+"]/div[3]/button"
 
-account_login_eli = "eli.bear__"
-account_login_pass_eli = "rirqot-tacgaq-1tySqi"
+# If you're this keen eyed then the account is yours! (it's my spam so dw)
 
 TESTUSERNAME1 = "imjustbait"
 TESTUSERNAME2 = "instagram"

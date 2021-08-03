@@ -25,7 +25,7 @@ except:
 driver = True
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
-
+server = app.server
 #
 #
 #   Homepage
@@ -544,6 +544,7 @@ def follow_new_users(n, method, users):
 
                         try:
                             follow_button = driver.find_element_by_xpath(followers_button_xpath)
+                            follow_button.location_once_scrolled_into_view
                             follow_button.click()
                         except:
                             text.append("Could not click on the followers button <--")
@@ -602,7 +603,6 @@ def follow_new_users(n, method, users):
 def unfollow_users(n, method, username):
     if n == None:
         return None
-
     if method == 1:
         # follow posts
         try:
@@ -619,14 +619,17 @@ def unfollow_users(n, method, username):
                     sleep(2)
                     try:
                         count = 1
+                        error = 0
                         print(following_number)
-                        while count <= (following_number + 1):
+                        while count <= (following_number + 1) and error < 10:
                             try:
                                 new_username_tag = driver.find_element_by_xpath(username_from_unfollowing_list(count))
                                 new_username = new_username_tag.text
+                                error = 0
                             except:
                                 text.append('failed to find the new username')
                                 count=following_number+1
+                                error += 1
                                 continue
 
                             print(new_username)
@@ -649,6 +652,9 @@ def unfollow_users(n, method, username):
 
                             sleep_random_decimals(20, 40)
                             count = count + 1
+
+                        if (error ==10):
+                            text.append('Failed to find username 10 times in a row. Error.')
 
                         return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
                     except:
@@ -701,4 +707,4 @@ def update_console_log(n):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8080, host="0.0.0.0")
+    app.run_server(debug=False, port=8080, host="0.0.0.0")
