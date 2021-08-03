@@ -705,6 +705,7 @@ def toggle_collapse2(n, is_open):
 def update_console_log(n):
     return array_to_string(text)
 
+app.title = 'Instamation'
 
 if __name__ == '__app__':
     app.run_server(debug=False, port=8080, host="0.0.0.0")
