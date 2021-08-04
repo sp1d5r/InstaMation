@@ -8,6 +8,13 @@ TODO:// Moving all of the functions from the instafuncts python file to this one
  - store username in DCC
  - pickle name needs to be the username :)
  - that means you can have a single account open once. idk if this will work on the driver tho...
+
+TODO://
+ - okay so quick update...
+ - callback issues... almost everywhere.
+ - callback deletes the driver...
+ - but
+    - this needs setup to be moved into this python script... see where the issue is...
 '''
 
 import dash
