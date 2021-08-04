@@ -21,7 +21,6 @@ try:
     from selenium import webdriver
     import time
     import random
-    import pickle
 except:
     pass
 
@@ -412,35 +411,34 @@ def display_page(pathname):
     dash.dependencies.Output("test-alert", "children"), [dash.dependencies.Input("test-requirements", "n_clicks")]
 )
 def on_button_click(n):
-    if n == None:
-        return ''
-    testArray = ['selenium', 'time', 'random']
-    # test selinium
-    try:
-        from selenium import webdriver
-        testArray[0] = ''
-    except ImportError as e:
-        pass
-    # test time
-    try:
-        import time
-        testArray[1] = ''
-    except ImportError as e:
-        pass
+    if n:
+        testArray = ['selenium', 'time', 'random']
+        # test selinium
+        try:
+            from selenium import webdriver
+            testArray[0] = ''
+        except ImportError as e:
+            pass
+        # test time
+        try:
+            import time
+            testArray[1] = ''
+        except ImportError as e:
+            pass
 
-    # test random
-    try:
-        import random
-        testArray[2] = ''
-    except ImportError as e:
-        pass
+        # test random
+        try:
+            import random
+            testArray[2] = ''
+        except ImportError as e:
+            pass
 
-    stringoftests = testArray[0] + ' ' + testArray[1] + ' ' + testArray[2]
+        stringoftests = testArray[0] + ' ' + testArray[1] + ' ' + testArray[2]
 
-    if (len(stringoftests) > 2):
-        return dbc.Alert(children=("Error! Install: " + stringoftests), color="danger", style={'height': '10%'})
+        if (len(stringoftests) > 2):
+            return dbc.Alert(children=("Error! Install: " + stringoftests), color="danger", style={'height': '10%'})
 
-    return dbc.Alert(children="All Requirements are up-to-date!", color="success", style={'height': '10%'})
+        return dbc.Alert(children="All Requirements are up-to-date!", color="success", style={'height': '10%'})
 
 
 @app.callback(
@@ -451,18 +449,15 @@ def on_button_click(n):
      ]
 )
 def start_server(n, username, password):
-    if n == None:
-        return None
-    try:
-        text.append('Attempting Login:  ' + username)
-        driver = start_up(username, password)
-        with open('driver.pickle', 'wb') as f:
-            pickle.dump(driver, f)
-        text.append('logged in as user: ' + username)
-        text.append('logged in Successful!')
-        return dbc.Alert(children="Logged in Success", color='success', style={'marginTop': 10})
-    except:
-        return dbc.Alert(children="Login Failed...", color='danger', style={'marginTop': 10})
+    if n :
+        try:
+            text.append('Attempting Login:  ' + username)
+            driver = start_up(username, password)
+            text.append('logged in as user: ' + username)
+            text.append('logged in Successful!')
+            return dbc.Alert(children="Logged in Success", color='success', style={'marginTop': 10})
+        except:
+            return dbc.Alert(children="Login Failed...", color='danger', style={'marginTop': 10})
 
 
 @app.callback(
@@ -471,77 +466,23 @@ def start_server(n, username, password):
         dash.dependencies.Input('follow-new-users-button', 'n_clicks'),
         dash.dependencies.Input('follow-new-users-input', 'value'),
         dash.dependencies.Input('follow_users_text', 'value'),
+        dash.dependencies.Input('username', 'value'),
+        dash.dependencies.Input('password', 'value')
     ]
 )
-def follow_new_users(n, method, users):
-    if n == None:
-        return None
-    user_array = users.split()
-    with open("driver.pickle", 'rb') as f:
-        driver = pickle.load(f)
-    if method == 1:
-        # follow posts
+def follow_new_users(n, method, users, username, password):
+    if n:
+        user_array = users.split()
         try:
-            count = 0
-            while count < len(user_array):
-                for i in user_array:
-                    # collect the usernames that you need to follow
-                    go_to_page(i, driver)
-                    text.append('At ' + i + 's page')
-                    sleep_random_decimals(2, 4)
-                    try:
-                        first_post = driver.find_element_by_xpath(first_post_xpath1)
-                    except:
-                        try:
-                            first_post = driver.find_element_by_xpath(first_post_xpath2)
-                        except:
-                            text.append("Could not find the first post <-- Serious Error, report to Eli")
-                            text.append('moving on to next user')
-                            continue
-
-                    first_post.location_once_scrolled_into_view
-                    sleep_random_decimals(2, 4)
-                    first_post.click()
-                    sleep_random_decimals(2, 4)
-
-                    try:
-                        bars = driver.find_element_by_xpath(bar_xpath)
-                        bars.location_once_scrolled_into_view
-                        likes = driver.find_element_by_xpath(liked_by_xpath)
-                        sleep_random_decimals(2, 4)
-                    except:
-                        text.append('The first post was probably a video, moving on...')
-                        continue
-                    sleep_random_decimals(1, 2)
-                    likes.click()
-                    sleep_random_decimals(2, 4)
-                    for j in range(1, random.randint(10, 50)):
-                        try:
-                            new_username = driver.find_element_by_xpath(
-                                username_from_list(j))
-                            follow_button = driver.find_element_by_xpath(
-                                follow_button_from_list(j))
-
-                            if follow_button.text == "Follow":
-                                new_username_text = new_username.text
-                                follow_button.click()
-                                text.append("following:\t" + new_username_text)
-                            else:
-                                text.append("Already Following: \t" + new_username.text)
-                            # Make a database of users to follow
-                            sleep_random_decimals(30, 50)
-                            follow_button.location_once_scrolled_into_view
-                        except:
-                            text.append("Unable to Follow Users --> If persists, message Elijah")
-                    # sleep randomly inbetween getting users to reduce the suspicion of instagram
-                    sleep_random_decimals(60, 120)
-                count += 1
-            return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
+            text.append('Attempting Login:  ' + username)
+            driver = start_up(username, password)
+            text.append('logged in as user: ' + username)
+            text.append('logged in Successful!')
         except:
-            text.append('Program Follow Function Failed, send screenshot to Eli')
+            text.append('Login Failed...')
             return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
-    elif method == 2:
-        try:
+        if method == 1:
+            # follow posts
             try:
                 count = 0
                 while count < len(user_array):
@@ -549,34 +490,39 @@ def follow_new_users(n, method, users):
                         # collect the usernames that you need to follow
                         go_to_page(i, driver)
                         text.append('At ' + i + 's page')
-                        sleep_random_decimals(4, 6)
+                        sleep_random_decimals(2, 4)
+                        try:
+                            first_post = driver.find_element_by_xpath(first_post_xpath1)
+                        except:
+                            try:
+                                first_post = driver.find_element_by_xpath(first_post_xpath2)
+                            except:
+                                text.append("Could not find the first post <-- Serious Error, report to Eli")
+                                text.append('moving on to next user')
+                                continue
+
+                        first_post.location_once_scrolled_into_view
+                        sleep_random_decimals(2, 4)
+                        first_post.click()
+                        sleep_random_decimals(2, 4)
 
                         try:
-                            follow_button = driver.find_element_by_xpath(followers_button_xpath)
-                            follow_button.location_once_scrolled_into_view
-                            follow_button.click()
+                            bars = driver.find_element_by_xpath(bar_xpath)
+                            bars.location_once_scrolled_into_view
+                            likes = driver.find_element_by_xpath(liked_by_xpath)
+                            sleep_random_decimals(2, 4)
                         except:
-                            text.append("Could not click on the followers button <--")
+                            text.append('The first post was probably a video, moving on...')
                             continue
-
-                        sleep(5)
-
-                        for j in range(2, random.randint(10, 50)):
+                        sleep_random_decimals(1, 2)
+                        likes.click()
+                        sleep_random_decimals(2, 4)
+                        for j in range(1, random.randint(10, 50)):
                             try:
-                                try:
-                                    # print(username_from_followers_list(j))
-                                    new_username = driver.find_element_by_xpath(
-                                        username_from_followers_list(j))
-                                except:
-                                    text.append('Could not get username button...')
-
-                                try:
-                                    # print(follow_button_from_followers_list(j))
-                                    follow_button = driver.find_element_by_xpath(
-                                        follow_button_from_followers_list(j))
-                                except:
-                                    text.append('Could not get follow button...')
-                                    continue
+                                new_username = driver.find_element_by_xpath(
+                                    username_from_list(j))
+                                follow_button = driver.find_element_by_xpath(
+                                    follow_button_from_list(j))
 
                                 if follow_button.text == "Follow":
                                     new_username_text = new_username.text
@@ -592,13 +538,69 @@ def follow_new_users(n, method, users):
                         # sleep randomly inbetween getting users to reduce the suspicion of instagram
                         sleep_random_decimals(60, 120)
                     count += 1
-
                 return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
             except:
                 text.append('Program Follow Function Failed, send screenshot to Eli')
                 return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
-        except:
-            return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
+        elif method == 2:
+            try:
+                try:
+                    count = 0
+                    while count < len(user_array):
+                        for i in user_array:
+                            # collect the usernames that you need to follow
+                            go_to_page(i, driver)
+                            text.append('At ' + i + 's page')
+                            sleep_random_decimals(4, 6)
+
+                            try:
+                                follow_button = driver.find_element_by_xpath(followers_button_xpath)
+                                follow_button.location_once_scrolled_into_view
+                                follow_button.click()
+                            except:
+                                text.append("Could not click on the followers button <--")
+                                continue
+
+                            sleep(5)
+
+                            for j in range(2, random.randint(10, 50)):
+                                try:
+                                    try:
+                                        # print(username_from_followers_list(j))
+                                        new_username = driver.find_element_by_xpath(
+                                            username_from_followers_list(j))
+                                    except:
+                                        text.append('Could not get username button...')
+
+                                    try:
+                                        # print(follow_button_from_followers_list(j))
+                                        follow_button = driver.find_element_by_xpath(
+                                            follow_button_from_followers_list(j))
+                                    except:
+                                        text.append('Could not get follow button...')
+                                        continue
+
+                                    if follow_button.text == "Follow":
+                                        new_username_text = new_username.text
+                                        follow_button.click()
+                                        text.append("following:\t" + new_username_text)
+                                    else:
+                                        text.append("Already Following: \t" + new_username.text)
+                                    # Make a database of users to follow
+                                    sleep_random_decimals(30, 50)
+                                    follow_button.location_once_scrolled_into_view
+                                except:
+                                    text.append("Unable to Follow Users --> If persists, message Elijah")
+                            # sleep randomly inbetween getting users to reduce the suspicion of instagram
+                            sleep_random_decimals(60, 120)
+                        count += 1
+
+                    return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
+                except:
+                    text.append('Program Follow Function Failed, send screenshot to Eli')
+                    return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
+            except:
+                return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
 
 
 @app.callback(
@@ -606,87 +608,94 @@ def follow_new_users(n, method, users):
     [
         dash.dependencies.Input('unfollow-users-button', 'n_clicks'),
         dash.dependencies.Input('unfollow-users-type-input', 'value'),
-        dash.dependencies.Input('your_username_text', 'value')
+        dash.dependencies.Input('your_username_text', 'value'),
+        dash.dependencies.Input('username', 'value'),
+        dash.dependencies.Input('password', 'value')
     ]
 )
-def unfollow_users(n, method, username):
-    if n == None:
-        return None
-    with open("driver.pickle", 'rb') as f:
-        driver = pickle.load(f)
-    if method == 1:
-        # follow posts
+def unfollow_users(n, method, username, username1, password):
+    if n:
         try:
+            text.append('Attempting Login:  ' + username)
+            driver = start_up(username, password)
+            text.append('logged in as user: ' + username)
+            text.append('logged in Successful!')
+        except:
+            text.append('Login Failed...')
+            return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
+        if method == 1:
+            # follow posts
             try:
-                go_to_page(username, driver)
-                text.append('At ' + username + 's page')
-                sleep(2)
                 try:
-                    following_button = driver.find_element_by_xpath(following_button_xpath)
-                    following_number = int(driver.find_element_by_xpath(following_number_xpath).text.replace(',', ''))
-                    text.append('Following : ' + str(following_number))
-                    sleep(2)
-                    following_button.click()
+                    go_to_page(username, driver)
+                    text.append('At ' + username + 's page')
                     sleep(2)
                     try:
-                        count = 1
-                        error = 0
-                        print(following_number)
-                        while count <= (following_number + 1) and error < 10:
-                            try:
-                                new_username_tag = driver.find_element_by_xpath(username_from_unfollowing_list(count))
-                                new_username = new_username_tag.text
-                                error = 0
-                            except:
-                                text.append('failed to find the new username')
-                                count=following_number+1
-                                error += 1
-                                continue
+                        following_button = driver.find_element_by_xpath(following_button_xpath)
+                        following_number = int(driver.find_element_by_xpath(following_number_xpath).text.replace(',', ''))
+                        text.append('Following : ' + str(following_number))
+                        sleep(2)
+                        following_button.click()
+                        sleep(2)
+                        try:
+                            count = 1
+                            error = 0
+                            print(following_number)
+                            while count <= (following_number + 1) and error < 10:
+                                try:
+                                    new_username_tag = driver.find_element_by_xpath(username_from_unfollowing_list(count))
+                                    new_username = new_username_tag.text
+                                    error = 0
+                                except:
+                                    text.append('failed to find the new username')
+                                    count=following_number+1
+                                    error += 1
+                                    continue
 
-                            print(new_username)
-                            try:
-                                unfollow_button = driver.find_element_by_xpath(
-                                    unfollow_button_from_unfollowing_list(count))
-                            except:
-                                text.append('failed to find the unfollow button')
-                                count = following_number + 1
-                                continue
+                                print(new_username)
+                                try:
+                                    unfollow_button = driver.find_element_by_xpath(
+                                        unfollow_button_from_unfollowing_list(count))
+                                except:
+                                    text.append('failed to find the unfollow button')
+                                    count = following_number + 1
+                                    continue
 
-                            unfollow_button.click()
-                            try:
-                                confirm_button = driver.find_element_by_xpath(confirm_unfollow_button)
-                                confirm_button.click()
-                            except:
-                                print('user did not have a confirm unfollow button')
-                            text.append('Unfollowed: ' + new_username)
-                            new_username_tag.location_once_scrolled_into_view
+                                unfollow_button.click()
+                                try:
+                                    confirm_button = driver.find_element_by_xpath(confirm_unfollow_button)
+                                    confirm_button.click()
+                                except:
+                                    print('user did not have a confirm unfollow button')
+                                text.append('Unfollowed: ' + new_username)
+                                new_username_tag.location_once_scrolled_into_view
 
-                            sleep_random_decimals(20, 40)
-                            count = count + 1
+                                sleep_random_decimals(20, 40)
+                                count = count + 1
 
-                        if (error == 10):
-                            text.append('Failed to find username 10 times in a row. Error.')
+                            if (error == 10):
+                                text.append('Failed to find username 10 times in a row. Error.')
 
-                        return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
+                            return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
+                        except:
+                            text.append('failed to get the following')
+                            return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
                     except:
-                        text.append('failed to get the following')
+                        text.append('unable to click the following button')
                         return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
                 except:
-                    text.append('unable to click the following button')
+                    text.append('Unable to travel to your page, check username.')
                     return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
-            except:
-                text.append('Unable to travel to your page, check username.')
-                return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
 
-        except:
-            text.append('Program Unfollow Function Failed, send screenshot to Eli')
-            return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
-    elif method == 2:
-        try:
-            return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
-        except:
-            text.append('Program Unfollow Function Failed, send screenshot to Eli')
-            return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
+            except:
+                text.append('Program Unfollow Function Failed, send screenshot to Eli')
+                return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
+        elif method == 2:
+            try:
+                return dbc.Alert(children="Success!", color='success', style={'marginTop': 10})
+            except:
+                text.append('Program Unfollow Function Failed, send screenshot to Eli')
+                return dbc.Alert(children="Failed", color='danger', style={'marginTop': 10})
 
 
 @app.callback(
@@ -710,11 +719,12 @@ def toggle_collapse2(n, is_open):
         return not is_open
     return is_open
 
-
+'''
 @app.callback(dash.dependencies.Output('console-log', 'children'),
               [dash.dependencies.Input('interval-component', 'n_intervals')])
 def update_console_log(n):
     return array_to_string(text)
+'''
 
 server.secret_key = os.environ.get('SECRET_KEY', 'default-value-used-in-development')
 app.title = 'Instamation'
