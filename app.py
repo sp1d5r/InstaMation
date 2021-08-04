@@ -4,7 +4,10 @@ THIS IS THE MAIN PROGRAM -- Frontend
 TODO:// Moving all of the functions from the instafuncts python file to this one, Poor structure but it's easier to build
  - Move comment all button to this
  - Include the tutorial page
-
+ - Pickle the driver variables
+ - store username in DCC
+ - pickle name needs to be the username :)
+ - that means you can have a single account open once. idk if this will work on the driver tho...
 '''
 
 import dash
@@ -18,11 +21,14 @@ try:
     from selenium import webdriver
     import time
     import random
+    import pickle
 except:
     pass
 
 # GLOBAL DRIVER VARIABLE
-driver = True
+# Driver is stored as a pickled object... This means there can only be one person operating the server at any given time
+# :( proper proper sad...
+# The goal
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
@@ -448,9 +454,10 @@ def start_server(n, username, password):
     if n == None:
         return None
     try:
-        global driver
         text.append('Attempting Login:  ' + username)
         driver = start_up(username, password)
+        with open('driver.pickle', 'wb') as f:
+            pickle.dump(driver, f)
         text.append('logged in as user: ' + username)
         text.append('logged in Successful!')
         return dbc.Alert(children="Logged in Success", color='success', style={'marginTop': 10})
@@ -470,6 +477,8 @@ def follow_new_users(n, method, users):
     if n == None:
         return None
     user_array = users.split()
+    with open("driver.pickle", 'rb') as f:
+        driver = pickle.load(f)
     if method == 1:
         # follow posts
         try:
@@ -603,6 +612,8 @@ def follow_new_users(n, method, users):
 def unfollow_users(n, method, username):
     if n == None:
         return None
+    with open("driver.pickle", 'rb') as f:
+        driver = pickle.load(f)
     if method == 1:
         # follow posts
         try:
